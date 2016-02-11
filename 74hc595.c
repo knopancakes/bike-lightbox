@@ -1,16 +1,10 @@
 #include <avr/io.h>
 #include "74hc595.h"
 
-#define SRCLK_Pin 			PB6
-#define RCLK_Pin 			PB5
-#define SER_Pin 			PB4
-#define SREG_PORT	 		PORTB
-#define SREG_DDR			DDRB
-
 void shifter_init()
 {
-	  SREG_DDR 	= 0x00;
-	  SREG_PORT = (SRCLK_Pin | RCLK_Pin  | SER_Pin);
+	  SREG_PORT = 0x00;
+	  SREG_DDR	= ((1<<SRCLK_Pin) | (1<<RCLK_Pin)  | (1<<SER_Pin));
 }
 
 void shift(unsigned long data)
@@ -20,7 +14,8 @@ void shift(unsigned long data)
 
 	int i;
 
-	for (i = 0; i < (8 * number_of_74hc595s); i++){// Now we are entering the loop to shift out 8+ bits
+	// Now we are entering the loop to shift out 8+ bits
+	for (i = 0; i < (8 * number_of_74hc595s); i++){
 		// Set the serial-clock pin low
 		SREG_PORT &= ~(1 << SRCLK_Pin);
 		// Go through each bit of data and output it

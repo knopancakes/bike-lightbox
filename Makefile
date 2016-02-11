@@ -1,19 +1,21 @@
 BIN=lightbox
-OBJS=lightbox.o 74hc595.o leds.o
+OBJS=lightbox.o 74hc595.o leds.o uart.o
 
 CC=avr-gcc
 OBJCOPY=avr-objcopy
-CFLAGS=-Os -DF_CPU=16000000UL -mmcu=atmega32u4
+CFLAGS=-Os -DF_CPU=16000000 -mmcu=atmega32u4 -g
 PORT=/dev/ttyACM0
 
 ${BIN}.hex: ${BIN}.elf
 	${OBJCOPY} -O ihex -R .eeprom $< $@
 
 ${BIN}.elf: ${OBJS}
-	${CC} -o $@ $^
+	${CC} -mmcu=atmega32u4 -g -o $@ $^
 
 install: ${BIN}.hex
-	avrdude -F -V -c avr109 -p ATMEGA32U4 -P ${PORT} -b 57600 -D -U flash:w:$<
+	python reset.py -P ${PORT}
+#	sleep 2
+	avrdude -patmega32u4 -cavr109 -P$(PORT) -b9600 -D -Uflash:w:$<
 
 
 clean:
