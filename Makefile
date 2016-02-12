@@ -1,5 +1,7 @@
 BIN=lightbox
-OBJS=lightbox.o 74hc595.o leds.o uart.o
+OBJS=main.o 74hc595.o leds.o uart.o
+PWD=`pwd`
+SRC=src
 
 CC=avr-gcc
 OBJCOPY=avr-objcopy
