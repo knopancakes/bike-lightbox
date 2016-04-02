@@ -12,7 +12,23 @@
 #define HIBEAMS_DDR		DDRD
 #define HIBEAMS			PD6
 
+typedef enum indications {
+	left,
+	right,
+	both,
+	hazard,
+	random
+};
+
+typedef enum indication_mode {
+	flash,
+	scroll,
+	marquee,
+	loop
+};
+
 void leds_init();
-void led_color(uint8_t color);
+void indicator_color(uint8_t red, uint8_t green, uint8_t blue);
+void turn_signal(enum indications indication, enum indication_mode mode);
 
 #endif

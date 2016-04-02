@@ -3,7 +3,6 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include "leds.h"
-#include "74hc595.h"
 #include "uart.h"
 
 
