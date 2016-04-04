@@ -3,8 +3,8 @@
 
 void shifter_init()
 {
-	  SREG_PORT = 0x00;
-	  SREG_DDR	= ((1<<SRCLK_Pin) | (1<<RCLK_Pin)  | (1<<SER_Pin));
+	  SREG_PORT |= 0x00;
+	  SREG_DDR	|= ((1<<SRCLK_Pin) | (1<<RCLK_Pin)  | (1<<SER_Pin));
 }
 
 void shift(unsigned long data)

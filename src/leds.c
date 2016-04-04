@@ -2,73 +2,79 @@
 #include "74hc595.h"
 #include "leds.h"
 
+indications turn_lights;
+indication_mode turn_lights_mode;
+indication_mode brake_light;
+
 ISR(TIMER1_OVF_vect)
 {
 	// PWM
 
 	// blinky delay
-	// shift(rear_lights_active);
+	//shift(rear_lights_active);
 }
 
 void leds_init()
 {
+	shifter_init();
+	turn_signal(0, 0);
 
-	HIBEAMS_PORT 	= 0x00;
-	HIBEAMS_DDR	 	= (1<<HIBEAMS);
+	HIBEAMS_PORT 	|= (1<<HIBEAMS); 	// set pin high
+	HIBEAMS_DDR 	|= (1<<HIBEAMS);	// set output
+	//brake_lights(0);
 
-	LED_PORT |=  _BV(BTN_LED);
-	LED_DDR = (_BV(RGB_LED_R) | _BV(RGB_LED_G) | _BV(RGB_LED_B) | _BV(BTN_LED));
 }
 
-void indicator_color(uint8_t red, uint8_t green, uint8_t blue)
+
+void brake_lights(indication_mode mode)
 {
-//	uint8_t color_out = LED_PORT;
-//	color_out &= !(_BV(RGB_LED_R) | _BV(RGB_LED_G) | _BV(RGB_LED_B) );
-//	if( 0x01 & (color >> 2)) {
-//		color_out |= _BV(RGB_LED_R);
-//	}
-//	if( 0x01 & (color >> 1)) {
-//		color_out |= _BV(RGB_LED_G);
-//	}
-//	if( 0x01 & (color >> 0)) {
-//		color_out |= _BV(RGB_LED_B);
-//	}
-//	LED_PORT = color_out;
-}
-
-void turn_signal(enum indications indication)
-{
-	// todo account for brake lights active or no
-	switch(indication) {
-	case off:
-		rear_lights_active = 0x0000;
-		rear_lights_mode = flash;
+	switch(mode){
+	case pwm:
+		HIBEAMS_PORT 	&= ~(1<<HIBEAMS);
 		break;
-	case left_flash:
-		rear_lights = 0xFF00;
-		break;
-	case right_flash:
-		rear_lights = 0x00FF;
-		break;
-	case both_flash:
-		rear_lights = 0xFFFF;
-		break;
-	case left_scroll:
-
-		break;
-	case right_scroll:
-
-		break;
-	case both_scroll:
-
-		break;
-	case circular_scroll:
-
-		break;
-	case random:
-
+	case flash:
+		HIBEAMS_PORT 	&= ~(1<<HIBEAMS);
 		break;
 	default:
+		HIBEAMS_PORT	|= (1<<HIBEAMS);
 		break;
 	}
+}
+
+void turn_signal(indications indication, indication_mode mode)
+{
+	switch(indication) {
+	case ind_left:
+		turn_lights = 0xFF00;
+		break;
+	case ind_right:
+		turn_lights = 0x00FF;
+		break;
+	case ind_hazard:
+		turn_lights = 0xFFFF;
+		break;
+	default:
+		turn_lights = 0x0000;
+		break;
+	}
+
+	switch(mode) {
+	case scroll:
+		turn_lights_mode = scroll;
+		break;
+	case flash:
+		turn_lights_mode = flash;
+		break;
+	case loop:
+		turn_lights_mode = loop;
+		break;
+	case random:
+		turn_lights_mode = random;
+		break;
+	default:
+		turn_lights_mode = off;
+		break;
+	}
+
+	shift(turn_lights);
 }

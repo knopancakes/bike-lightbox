@@ -7,7 +7,7 @@ ISR(TIMER0_OVF_vect)
 // Debounce buttons. debounce() is declared static inline
 // in debounce.h so we will not suffer from the added overhead
 // of a (external) function call
-debounce();
+//debounce();
 }
 
 void buttons_init()

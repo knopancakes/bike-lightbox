@@ -10,48 +10,23 @@
 int main(){
 
 	leds_init();
-	shifter_init();
-	uart_init();
-	sei();
+	//uart_init();
+	//sei();
 
-    stdout = &uart_output;
-    stdin  = &uart_input;
+	//stdout = &uart_output;
+    //stdin  = &uart_input;
 
-    char input;
+    //char input;
 
     while(1) {
 
-//    	led_color(0);
-//        shift(0xFFFF);
-//        _delay_ms(1000);
-//
-//        led_color(1);
-//        shift(0xFF00);
-//        _delay_ms(1000);
-//
-//        led_color(2);
-//        shift(0x00FF);
-//        _delay_ms(1000);
-//
-//        led_color(3);
-//        shift(0xF0F0);
-//        _delay_ms(1000);
-//
-//    	led_color(4);
-//        shift(0x0F0F);
-//        _delay_ms(1000);
-//
-//    	led_color(5);
-//        shift(0x5555);
-//        _delay_ms(1000);
-//
-//        led_color(6);
-//        shift(0xAAAA);
-//        _delay_ms(1000);
-//
-//        led_color(7);
-//        shift(0x0000);
-//        _delay_ms(1000);
+    	brake_lights(pwm);
+    	turn_signal(ind_left,flash);
+    	_delay_ms(4000);
+
+    	brake_lights(off);
+		turn_signal(ind_right,flash);
+    	_delay_ms(4000);
 
     }
 
