@@ -1,24 +1,32 @@
- 
+#include <stdint.h>
 #include <avr/interrupt.h>
-
-// Called at about 100Hz (122Hz)
-ISR(TIMER0_OVF_vect)
-{
-// Debounce buttons. debounce() is declared static inline
-// in debounce.h so we will not suffer from the added overhead
-// of a (external) function call
-//debounce();
-}
+#include <avr/io.h>
+#include "buttons.h"
+#include "leds.h"
 
 void buttons_init()
 {
-	// BORTB output
-	DDRB = 0xFF;
-	// High turns off LED’s on STK500
-	PORTB = 0xFF;
-	// Timer0 normal mode, presc 1:256
-	TCCR0B = 1<<CS02;
-	// Overflow interrupt. (at 8e6/256/256 = 122 Hz)
-	TIMSK0 = 1<<TOIE0;
+	// switch inputs
+	DDRF &= ~((1<<TURN_SW_LEFT) | (1<<TURN_SW_RIGHT));
+
+	// pull up
+	TURN_SW_PORT |= ((1<<TURN_SW_LEFT) + (1<<TURN_SW_RIGHT));
+
+
+}
+
+
+int get_signal_switch_status(void)
+{
+	if( (TURN_SW & (1<< TURN_SW_LEFT)) == 0x00 ) {
+		return ind_left;
+	}
+	else if( (TURN_SW & (1<<TURN_SW_RIGHT)) == 0x00 ) {
+		return ind_right;
+	}
+	else {
+		return ind_off;
+	}
+
 
 }

@@ -2,7 +2,11 @@
 #define _BUTTONS_H
 
 #define TURN_SW_PORT	PORTD
-#define TURN_SW_LEFT	PF1
-#define TURN_SW_RIGHT	PF2
+#define TURN_SW_LEFT	PD1
+#define TURN_SW_RIGHT	PD0
+#define TURN_SW			PIND
 
-#endif _BUTTONS_H
+int get_signal_switch_status(void);
+void buttons_init(void);
+
+#endif

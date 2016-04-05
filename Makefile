@@ -9,7 +9,7 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(SOURCES:%.c=%.o))
 MCU=atmega32u4
 CC=avr-gcc
 OBJCOPY=avr-objcopy
-CFLAGS=-Os -DF_CPU=16000000 -mmcu=atmega32u4 -g
+CFLAGS=-g -Wall -Os -DF_CPU=16000000UL -mmcu=atmega32u4
 PORT=/dev/ttyACM0
 
 dir_guard=@mkdir -p $(@D)       
@@ -31,4 +31,4 @@ install: ${BIN}.hex
 	avrdude -patmega32u4 -cavr109 -P$(PORT) -b9600 -D -Uflash:w:$<
 
 clean:
-	rm -f $(BUILDDIR)/${BIN}.elf $(BUILDDIR)/${BIN}.hex ${OBJECTS}
+	rm -f ${BIN}.elf ${BIN}.hex ${OBJECTS}
