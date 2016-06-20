@@ -45,9 +45,9 @@ void lsm303_read()
   uint8_t zhi = rx_data[5];
 
   // Shift values to create properly formed integer (low byte first)
-  accelData.x = (xlo | (xhi << 8)) >> 4;
-  accelData.y = (ylo | (yhi << 8)) >> 4;
-  accelData.z = (zlo | (zhi << 8)) >> 4;
+  lsm303accelData.x = (xlo | (xhi << 8)) >> 4;
+  lsm303accelData.y = (ylo | (yhi << 8)) >> 4;
+  lsm303accelData.z = (zlo | (zhi << 8)) >> 4;
 
   // Read the magnetometer
   i2c_readReg(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_OUT_X_H_M, rx_data, (byte)6);  
@@ -61,12 +61,12 @@ void lsm303_read()
   ylo = rx_data[5];
 
   // Shift values to create properly formed integer (low byte first)
-  magData.x = (xlo | (xhi << 8));
-  magData.y = (ylo | (yhi << 8));
-  magData.z = (zlo | (zhi << 8));
+  lsm303magData.x = (xlo | (xhi << 8));
+  lsm303magData.y = (ylo | (yhi << 8));
+  lsm303magData.z = (zlo | (zhi << 8));
 
   // ToDo: Calculate orientation
-  magData.orientation = 0.0;
+  lsm303magData.orientation = 0.0;
 }
 
 void lsm303_setMagGain(lsm303MagGain gain)

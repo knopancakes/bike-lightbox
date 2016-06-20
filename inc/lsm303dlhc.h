@@ -103,8 +103,8 @@ bool lsm303_begin(void);
 void lsm303_read(void);
 void lsm303_setMagGain(lsm303MagGain gain);
 
-lsm303AccelData accelData;    // Last read accelerometer data will be available here
-lsm303MagData magData;        // Last read magnetometer data will be available here
+lsm303AccelData lsm303accelData;    // Last read accelerometer data will be available here
+lsm303MagData lsm303magData;        // Last read magnetometer data will be available here
 
 void lsm303_write8(uint8_t address, uint8_t reg, uint8_t value);
 byte lsm303_read8(uint8_t address, uint8_t reg);
