@@ -14,10 +14,24 @@ int main(){
 	//stdout = &uart_output;
     //stdin  = &uart_input;
 
+	int special_mode = 0;
 	indications command, last_command;
+	indication_mode pattern;
     //char input;
 
 	brake_lights(pwm);
+
+
+	_delay_ms(1000);
+
+
+	last_command = -1;
+	command = get_signal_switch_status();
+
+	if(command != ind_off) {
+	  special_mode = 1;
+	}
+
 
     while(1) {
 
@@ -32,10 +46,17 @@ int main(){
 
     	last_command = command;
     	command = get_signal_switch_status();
+	if(special_mode && command == ind_off) {
+	  command = ind_hazard;
+	  pattern = loop;
+	} else {
+	  pattern = scroll;
+	}
+
 
     	if (command != last_command) {
     		leds_reset();
-    		turn_signal(command, scroll);
+    		turn_signal(command, pattern);
     	}
 
 

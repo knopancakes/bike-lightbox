@@ -8,6 +8,7 @@
 uint8_t scroll_pattern[4] = {0b01000001, 0b00100010, 0b00010100, 0b00001000};
 uint8_t scroll2_pattern[6] = { 0b01000001, 0b01100011, 0b00110110, 0b00011100, 0b00001000, 0b00000000};
 uint8_t flash_pattern[2] = { 0xFF, 0x00 };
+uint8_t scroll_flash[NUM_FRAMES] = { 0b01000001, 0b01100011, 0b00110110, 0b00011100, 0b00001000, 0b00000000, 0b11111111, 0b00000000, 0b11111111, 0b00000000};
 uint8_t loop_pattern[7] = { 0b01000000, 0b00100000, 0b00010000, 0b00001000, 0b00000100, 0b00000010, 0b00000001 };
 
 // commands
@@ -17,7 +18,7 @@ indication_mode brake_light;
 
 // pwm
 uint16_t animation_delay;
-const uint16_t animation_period = 300;
+const uint16_t animation_period = 500; // frame rate, higher is faster
 uint8_t animation_index;
 
 
@@ -137,13 +138,21 @@ ISR(TIMER1_COMPA_vect)
 	// Turn Lights
 	if (turn_lights_mode == scroll ) {
 		if(++animation_delay >= animation_period) {
-			shift( (turn_lights & ( (scroll2_pattern[animation_index] << 8 ) | scroll2_pattern[animation_index]) ));
+			animate();
 			animation_delay = 0;
-			if(++animation_index >= 6) {
+			if(++animation_index >= NUM_FRAMES) {
 				animation_index = 0;
 			}
 
 		}
+	} else if (turn_lights_mode == loop) {
+	  if(++animation_delay >= animation_period/2) {
+	    animate_loop();
+	    animation_delay = 0;
+	    if(++animation_index >= NUM_LOOP_FRAMES) {
+	      animation_index = 0;
+	    }
+	  }
 	}
 	HIBEAMS_PORT	&= ~(1<<HIBEAMS);
 }

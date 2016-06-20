@@ -9,6 +9,7 @@
 #define SREG_PORT	 		PORTF
 #define SREG_DDR			DDRF
 
+
 void shifter_init();
 
 void shift(unsigned long data);
