@@ -6,27 +6,45 @@
 
 void buttons_init()
 {
-	// switch inputs
-	DDRF &= ~((1<<TURN_SW_LEFT) | (1<<TURN_SW_RIGHT));
+	DDRD &= ~(1<<LEFT_TURN_SW);
+	DDRE &= ~(1<<RIGHT_TURN_SW);
 
-	// pull up
-	TURN_SW_PORT |= ((1<<TURN_SW_LEFT) + (1<<TURN_SW_RIGHT));
-
-
+	/* enable pull up resistors. switches are pull down */
+	LEFT_TURN_PORT |= (1<<LEFT_TURN_SW);
+	RIGHT_TURN_PORT |= (1<<RIGHT_TURN_SW);
 }
 
 
 int get_signal_switch_status(void)
 {
-	if( (TURN_SW & (1<< TURN_SW_LEFT)) == 0x00 ) {
-		return ind_left;
-	}
-	else if( (TURN_SW & (1<<TURN_SW_RIGHT)) == 0x00 ) {
-		return ind_right;
-	}
-	else {
-		return ind_off;
-	}
+  int left = 0;
+  int right = 0;
+  int ret = 0;
+  int i;
+ 
+  /* take a few samples in case the input is noisy */
+  for(i=0; i<20; i++) {
+    if( (RIGHT_TURN_PIN & (1<< RIGHT_TURN_SW)) == 0x00 ) {
+      right++;
+    }
+    if( (LEFT_TURN_PIN & (1<<LEFT_TURN_SW)) == 0x00 ) {
+      left++;
+    }
+  }
 
-
+  /* process samples */
+  if( (left > right) && (left > 10) ) 
+    {
+      ret = ind_left;
+    }
+  else if( (right > left) && (right > 10))
+    {
+      ret = ind_right;
+    } 
+  else {
+    ret = ind_off;
+  }  
+  
+  return ret;
+    
 }

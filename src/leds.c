@@ -4,6 +4,9 @@
 #include "74hc595.h"
 #include "leds.h"
 
+#define TAIL_ON()  { HIBEAMS_PORT	&= ~(1<<HIBEAMS); }
+#define TAIL_OFF() { HIBEAMS_PORT	|=  (1<<HIBEAMS); }
+
 // blink patterns
 uint8_t scroll_pattern[4] = {0b01000001, 0b00100010, 0b00010100, 0b00001000};
 uint8_t scroll2_pattern[6] = { 0b01000001, 0b01100011, 0b00110110, 0b00011100, 0b00001000, 0b00000000};
@@ -14,7 +17,7 @@ uint8_t loop_pattern[7] = { 0b01000000, 0b00100000, 0b00010000, 0b00001000, 0b00
 // commands
 indications turn_lights;
 indication_mode turn_lights_mode;
-indication_mode brake_light;
+indication_mode tail_lights_mode;
 
 // pwm
 uint16_t animation_delay;
@@ -43,17 +46,7 @@ void leds_reset(){
 
 void brake_lights(indication_mode mode)
 {
-	switch(mode){
-	case pwm:
-		HIBEAMS_PORT 	&= ~(1<<HIBEAMS);
-		break;
-	case flash:
-		HIBEAMS_PORT 	&= ~(1<<HIBEAMS);
-		break;
-	default:
-		HIBEAMS_PORT	|= (1<<HIBEAMS);
-		break;
-	}
+  tail_lights_mode = mode;
 }
 
 void turn_signal(indications indication, indication_mode mode)
@@ -97,19 +90,19 @@ void turn_signal(indications indication, indication_mode mode)
 
 void timer1_init()
 {
-	cli();
-
-	TCCR1B |= (1 << CS10) | (1 << WGM12);
-	OCR1A = 0x0FFF;
-	OCR1B = 0x00FF;
-    TCNT1 = 0;
-    TIMSK1 = (1 << OCIE1A) | (1 << OCIE1B);
-
-    // disable usb connection interrupt (for now, later we can use this to trigger bootloader)
-    USBCON = 0;
-
-    // enable global interrupts
-    sei();
+  cli();
+  
+  TCCR1B |= (1 << CS10) | (1 << WGM12);
+  OCR1A = 0x0FFF;
+  OCR1B = 0x00FF;
+  TCNT1 = 0;
+  TIMSK1 = (1 << OCIE1A) | (1 << OCIE1B);
+  
+  // disable usb connection interrupt (for now, later we can use this to trigger bootloader)
+  USBCON = 0;
+  
+  // enable global interrupts
+  sei();
 }
 
 
@@ -130,41 +123,52 @@ ISR(TIMER1_COMPB_vect){
 //		HIBEAMS_PORT |= (1<<HIBEAMS);
 //	}
 
-	HIBEAMS_PORT	|= (1<<HIBEAMS);
+  TAIL_OFF();
 }
 
 ISR(TIMER1_COMPA_vect)
 {
-	// Turn Lights
-	if (turn_lights_mode == scroll ) {
-		if(++animation_delay >= animation_period) {
-			animate();
-			animation_delay = 0;
-			if(++animation_index >= NUM_FRAMES) {
-				animation_index = 0;
-			}
-
-		}
-	} else if (turn_lights_mode == loop) {
-	  if(++animation_delay >= animation_period/2) {
-	    animate_loop();
-	    animation_delay = 0;
-	    if(++animation_index >= NUM_LOOP_FRAMES) {
+  // Turn Lights
+  if (turn_lights_mode == scroll ) 
+    {
+      if(++animation_delay >= animation_period) 
+	{
+	  animate();
+	  animation_delay = 0;
+	  if(++animation_index >= NUM_FRAMES) 
+	    {
 	      animation_index = 0;
 	    }
-	  }
 	}
-	HIBEAMS_PORT	&= ~(1<<HIBEAMS);
+    }
+  else if (turn_lights_mode == loop) 
+    {
+      if(++animation_delay >= animation_period/2) 
+	{
+	  animate_loop();
+	  animation_delay = 0;
+	  if(++animation_index >= NUM_LOOP_FRAMES) 
+	    {
+	      animation_index = 0;
+	    }
+	}
+    }
+
+  if(tail_lights_mode != off) {
+    TAIL_ON();
+  }
 }
 
 // USB general interrupt. it breaks everything -_- disabled above
-ISR(_VECTOR(10)) {
-	shift(0x0A00);
+ISR(_VECTOR(10)) 
+{
+  shift(0x0A00);
 }
 
 
-ISR(__vector_default){
-	shift(0xFFFF);
+ISR(__vector_default)
+{
+  shift(0xFFFF);
 }
 
 

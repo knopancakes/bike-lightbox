@@ -1,10 +1,13 @@
 #ifndef _BUTTONS_H
 #define _BUTTONS_H
 
-#define TURN_SW_PORT	PORTD
-#define TURN_SW_LEFT	PD1
-#define TURN_SW_RIGHT	PD0
-#define TURN_SW			PIND
+#define LEFT_TURN_PORT	PORTD
+#define LEFT_TURN_SW	PD7
+#define LEFT_TURN_PIN	PIND
+
+#define RIGHT_TURN_PORT	PORTE
+#define RIGHT_TURN_SW	PE6
+#define RIGHT_TURN_PIN	PINE
 
 int get_signal_switch_status(void);
 void buttons_init(void);

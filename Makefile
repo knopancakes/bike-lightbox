@@ -9,8 +9,9 @@ OBJECTS := $(addprefix $(BUILDDIR)/,$(SOURCES:%.c=%.o))
 MCU=atmega32u4
 CC=avr-gcc
 OBJCOPY=avr-objcopy
-CFLAGS=-g -Wall -Os -DF_CPU=16000000UL -mmcu=atmega32u4
+CFLAGS=-g -Wall -Os -DF_CPU=16000000UL -mmcu=atmega32u4 -DDEBUG=y
 PORT=/dev/ttyACM0
+DEBUG_FLAG=
 
 dir_guard=@mkdir -p $(@D)       
 

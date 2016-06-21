@@ -1,3 +1,6 @@
+/*
+ * Insert Description Here
+ */
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -9,10 +12,14 @@
 #include "buttons.h"
 #include "lsm303dlhc.h"
 
-int main(){
+#ifdef DEBUG
+#include "74hc595.h"
+#endif
 
+int main()
+{
   /* declarations */
-  bool special_mode = 0;
+  bool special_mode;
   indications command, last_command;
   indication_mode pattern;
   //char input;
@@ -23,8 +30,16 @@ int main(){
   timer1_init();
 
   /* initialize and read the lsm303 */
-  lsm303_begin();
-  lsm303_read();
+
+  if( lsm303_begin() ) 
+    {
+#ifdef DEBUG
+      shift(0xFFFF);
+      _delay_ms(2000);
+#endif
+    }
+
+  //lsm303_read();
   
   /* setup usb serial port */
   //stdout = &uart_output;
@@ -33,27 +48,30 @@ int main(){
   /* initialize pattern settings */
   last_command = ind_off;
   command = ind_off;
-  pattern = loop;
+  pattern = off;
   
   /* set light/indication mode to PWM driven */
-  brake_lights(pwm);
+  //brake_lights(pwm);
+  brake_lights(off);
   
   /* reset leds and animation driver */
   turn_signal(command, pattern);
   leds_reset();
 
   /* check to see if switch is depressed on startup */
-  _delay_ms(100);
   command = get_signal_switch_status();
   if(command != ind_off) 
     {
       special_mode = true;
+    } 
+  else 
+    {
+    special_mode = false;
     }
 
   while(true)
     {
       /* check to see if the user input has changed state */
-      last_command = command;
       command = get_signal_switch_status();
 
       /* if "special mode" is enabled, play a fancy animation on idle */
@@ -72,12 +90,13 @@ int main(){
       /* if the user input has changed, update the pattern driver state */
       if (command != last_command) 
 	{
-	  turn_signal(command, pattern);
 	  leds_reset();
+	  turn_signal(command, pattern);
     	}
 
       /* debounce user input */
-      _delay_ms(100);
+      last_command = command;
+      _delay_ms(200);
       
     }
   

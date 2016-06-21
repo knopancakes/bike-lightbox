@@ -23,6 +23,7 @@ typedef enum {
 
 extern indications turn_lights;
 extern indication_mode turn_lights_mode;
+extern indication_mode tail_lights_mode;
 
 #define NUM_FRAMES	10
 #define NUM_LOOP_FRAMES	7

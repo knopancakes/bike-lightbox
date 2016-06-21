@@ -8,29 +8,38 @@
   Written by Kevin Townsend for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
 ***************************************************************************/
+#include <util/delay.h>
 #include "i2c_master.h"
 #include "lsm303dlhc.h"
+#include "74hc595.h" // for debugging with shift();
 
 /***************************************************************************
  CONSTRUCTOR
 ***************************************************************************/
 bool lsm303_begin()
 {
-  //Wire.begin();
+  i2c_init();
+  
+  int ret = 0;
 
   // Enable the accelerometer
-  lsm303_write8(LSM303_ADDRESS_ACCEL, LSM303_REGISTER_ACCEL_CTRL_REG1_A, 0x27);
+  ret = lsm303_write8(LSM303_ADDRESS_ACCEL, LSM303_REGISTER_ACCEL_CTRL_REG1_A, 0x27);
   
   // Enable the magnetometer
-  lsm303_write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_MR_REG_M, 0x00);
+  //ret = lsm303_write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_MR_REG_M, 0x00);
+  
+  if(ret != 0)
+    {
+      return true;
+    }
 
-  return true;
+  return false;
 }
 
 /***************************************************************************
  PUBLIC FUNCTIONS
 ***************************************************************************/
-void lsm303_read()
+uint8_t lsm303_read()
 {
   byte rx_data[6];
 
@@ -67,6 +76,8 @@ void lsm303_read()
 
   // ToDo: Calculate orientation
   lsm303magData.orientation = 0.0;
+
+  return 0;
 }
 
 void lsm303_setMagGain(lsm303MagGain gain)
@@ -77,12 +88,23 @@ void lsm303_setMagGain(lsm303MagGain gain)
 /***************************************************************************
  PRIVATE FUNCTIONS
  ***************************************************************************/
-void lsm303_write8(byte address, byte reg, byte value)
+uint8_t lsm303_write8(byte address, byte reg, byte value)
 {
-  i2c_start(address);
-  i2c_write(reg);
-  i2c_write(value);
-  i2c_stop();
+
+  int ret = 0;
+  byte buf[1] = {value};
+
+  ret = i2c_writeReg(address, reg, buf, 0x01);
+
+#ifdef DEBUG
+  if(ret!=0)
+    {
+      shift(0xF0F0);
+      _delay_ms(2000);
+    }
+#endif
+
+  return 0;
 }
 
 uint8_t lsm303_read8(uint8_t address, uint8_t reg)

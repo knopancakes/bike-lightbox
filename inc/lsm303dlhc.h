@@ -11,8 +11,8 @@
 #ifndef __LSM303_H__
 #define __LSM303_H__
 
-#define LSM303_ADDRESS_ACCEL          (0x32 >> 1)         // 0011001x
-#define LSM303_ADDRESS_MAG            (0x3C >> 1)         // 0011110x
+#define LSM303_ADDRESS_ACCEL          0b0011001
+#define LSM303_ADDRESS_MAG            0b0011110
 #define LSM303_ID                     (0b11010100)
 
 #include <inttypes.h>
@@ -100,13 +100,13 @@ typedef struct lsm303MagData_s
 } lsm303MagData;
 
 bool lsm303_begin(void);
-void lsm303_read(void);
+uint8_t lsm303_read(void);
 void lsm303_setMagGain(lsm303MagGain gain);
 
 lsm303AccelData lsm303accelData;    // Last read accelerometer data will be available here
 lsm303MagData lsm303magData;        // Last read magnetometer data will be available here
 
-void lsm303_write8(uint8_t address, uint8_t reg, uint8_t value);
+uint8_t lsm303_write8(uint8_t address, uint8_t reg, uint8_t value);
 byte lsm303_read8(uint8_t address, uint8_t reg);
 
 
