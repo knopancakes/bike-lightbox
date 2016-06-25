@@ -11,8 +11,8 @@
 #ifndef __LSM303_H__
 #define __LSM303_H__
 
-#define LSM303_ADDRESS_ACCEL          0b0011001
-#define LSM303_ADDRESS_MAG            0b0011110
+#define LSM303_ADDRESS_ACCEL          (0x32 )         // 0011001x
+#define LSM303_ADDRESS_MAG            (0x3C )         // 0011110x
 #define LSM303_ID                     (0b11010100)
 
 #include <inttypes.h>

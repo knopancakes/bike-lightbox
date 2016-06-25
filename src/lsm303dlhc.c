@@ -13,6 +13,10 @@
 #include "lsm303dlhc.h"
 #include "74hc595.h" // for debugging with shift();
 
+
+#ifndef OK
+# define OK false
+#endif
 /***************************************************************************
  CONSTRUCTOR
 ***************************************************************************/
@@ -24,16 +28,40 @@ bool lsm303_begin()
 
   // Enable the accelerometer
   ret = lsm303_write8(LSM303_ADDRESS_ACCEL, LSM303_REGISTER_ACCEL_CTRL_REG1_A, 0x27);
+
+  if(ret != 0)
+    {
+#ifdef DEBUG
+      shift(0x7227);
+      _delay_ms(2000);
+#endif
+      //return !OK;
+    }
   
+  // LSM303DLHC has no WHOAMI register so read CTRL_REG1_A back to check
+  // if we are connected or not
+  /*  uint8_t reg1_a = 0;
+  reg1_a = lsm303_read8(LSM303_ADDRESS_ACCEL, LSM303_REGISTER_ACCEL_CTRL_REG1_A);
+  if (reg1_a != 0x27)
+    {
+#ifdef DEBUG
+      shift(0x0770);
+      _delay_ms(1000);
+      shift((0x0000|reg1_a));
+      _delay_ms(5000);
+#endif
+      return !OK;
+    }  
+  */
   // Enable the magnetometer
-  //ret = lsm303_write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_MR_REG_M, 0x00);
+  ret = lsm303_write8(LSM303_ADDRESS_MAG, LSM303_REGISTER_MAG_MR_REG_M, 0x00);
   
   if(ret != 0)
     {
-      return true;
+      return !OK;
     }
 
-  return false;
+  return OK;
 }
 
 /***************************************************************************
@@ -91,18 +119,21 @@ void lsm303_setMagGain(lsm303MagGain gain)
 uint8_t lsm303_write8(byte address, byte reg, byte value)
 {
 
-  int ret = 0;
-  byte buf[1] = {value};
+  int ret;
+  byte buf[1];
+ 
+  buf[0] = value;
+  ret = 0;
+  ret = i2c_writeReg(address, reg, buf, 1);
 
-  ret = i2c_writeReg(address, reg, buf, 0x01);
-
-#ifdef DEBUG
   if(ret!=0)
     {
-      shift(0xF0F0);
-      _delay_ms(2000);
-    }
+#ifdef DEBUG
+      shift(0x7777);
+      _delay_ms(1000);
 #endif
+      return 1;
+    }
 
   return 0;
 }
@@ -110,13 +141,9 @@ uint8_t lsm303_write8(byte address, byte reg, byte value)
 uint8_t lsm303_read8(uint8_t address, uint8_t reg)
 {
   byte value = 0;
+  byte buf[1];
 
-  i2c_start(address);
-  i2c_write(reg);
-  i2c_stop();
-//  Wire.requestFrom(address, (byte)1);
-//  value = Wire.read();
-//  Wire.endTransmission();
-// todo this isn't done
+  value = i2c_readReg(address,reg,buf,1);
+
   return value;
 }

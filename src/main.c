@@ -31,14 +31,7 @@ int main()
 
   /* initialize and read the lsm303 */
 
-  if( lsm303_begin() ) 
-    {
-#ifdef DEBUG
-      shift(0xFFFF);
-      _delay_ms(2000);
-#endif
-    }
-
+  lsm303_begin();
   //lsm303_read();
   
   /* setup usb serial port */
