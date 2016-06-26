@@ -16,6 +16,53 @@
 #include "74hc595.h"
 #endif
 
+#define BRAKING_THRESHOLD  	 1
+#define ACCEL_THRESHOLD		 1
+
+typedef struct {
+  double windup_guard;
+  double proportional_gain;
+  double integral_gain;
+  double derivative_gain;
+  double prev_error;
+  double int_error;
+  double control;
+} PID;
+ 
+void pid_zeroize(PID* pid) {
+  // set prev and integrated error to zero
+  pid->prev_error = 0;
+  pid->int_error = 0;
+}
+ 
+void pid_update(PID* pid, double curr_error, double dt) {
+  double diff;
+  double p_term;
+  double i_term;
+  double d_term;
+ 
+  // integration with windup guarding
+  pid->int_error += (curr_error * dt);
+  if (pid->int_error < -(pid->windup_guard))
+    pid->int_error = -(pid->windup_guard);
+  else if (pid->int_error > pid->windup_guard)
+    pid->int_error = pid->windup_guard;
+ 
+  // differentiation
+  diff = ((curr_error - pid->prev_error) / dt);
+ 
+  // scaling
+  p_term = (pid->proportional_gain * curr_error);
+  i_term = (pid->integral_gain     * pid->int_error);
+  d_term = (pid->derivative_gain   * diff);
+ 
+  // summation of terms
+  pid->control = p_term + i_term + d_term;
+ 
+  // save current error as previous error for next iteration
+  pid->prev_error = curr_error;
+}
+
 int main()
 {
   /* declarations */
@@ -23,16 +70,22 @@ int main()
   indications command, last_command;
   indication_mode pattern;
   //char input;
+  PID accel;
 
   /* initialize hardware */
   leds_init();
   buttons_init();
   timer1_init();
 
-  /* initialize and read the lsm303 */
+  /* setup control loop for brake light */
+  pid_zeroize(&accel);
+  accel.proportional_gain = 1.0f;
+  accel.integral_gain = 0.0f;
+  accel.derivative_gain = 0.0f;
 
+  /* initialize and read the lsm303 */
   lsm303_begin();
-  //lsm303_read();
+  lsm303_read();
   
   /* setup usb serial port */
   //stdout = &uart_output;
@@ -44,8 +97,8 @@ int main()
   pattern = off;
   
   /* set light/indication mode to PWM driven */
-  //brake_lights(pwm);
-  brake_lights(off);
+  brake_lights(pwm);
+  //brake_lights(off);
   
   /* reset leds and animation driver */
   turn_signal(command, pattern);
@@ -64,6 +117,28 @@ int main()
 
   while(true)
     {
+      /* update accel/mag data */
+      lsm303_read();
+      
+      /* update brake lights based on accel data */
+      // +- 17000
+      uint16_t intensity = 0;
+      pid_update(&accel, (double)lsm303accelData.z, 1);
+ 
+      if( (int)accel.control > BRAKING_THRESHOLD )
+	{
+	  intensity = 0x03FF;
+	}
+      else if( (int)accel.control < ACCEL_THRESHOLD )
+{	
+	  intensity = 0x0000;
+	}
+      else 
+	{
+	  intensity = 0x002F;
+	}
+      OCR1B = intensity;
+
       /* check to see if the user input has changed state */
       command = get_signal_switch_status();
 
@@ -89,9 +164,10 @@ int main()
 
       /* debounce user input */
       last_command = command;
-      _delay_ms(200);
+      _delay_ms(10);
       
     }
   
   return 0;
 }
+
