@@ -25,6 +25,9 @@ extern indications turn_lights;
 extern indication_mode turn_lights_mode;
 extern indication_mode tail_lights_mode;
 
+#define PWM_MAX         0x0FFF
+#define PWM_MIN         0x0000
+#define PWM_IDLE        0x0032
 #define NUM_FRAMES	10
 #define NUM_LOOP_FRAMES	7
 #define animate() shift( (turn_lights & ( (scroll_flash[animation_index] << 8 ) | scroll_flash[animation_index]) ));

@@ -20,6 +20,11 @@
 
 typedef uint8_t byte;
 
+#define LSM303_ACCEL_MAX
+#define LSM303_MAG_MAX
+#define LSM303_ACCEL_MIN
+#define LSM303_MAG_MIN
+
 typedef enum
   {                                                     // DEFAULT    TYPE
       LSM303_REGISTER_ACCEL_CTRL_REG1_A         = 0x20,   // 00000111   rw

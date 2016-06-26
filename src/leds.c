@@ -93,7 +93,7 @@ void timer1_init()
   cli();
   
   TCCR1B |= (1 << CS10) | (1 << WGM12);
-  OCR1A = 0x0FFF;
+  OCR1A = PWM_MAX;
   OCR1B = 0x00FF;
   TCNT1 = 0;
   TIMSK1 = (1 << OCIE1A) | (1 << OCIE1B);
