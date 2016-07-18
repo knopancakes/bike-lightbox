@@ -15,11 +15,11 @@ void buttons_init()
 }
 
 
-int get_signal_switch_status(void)
+indications get_signal_switch_status(void)
 {
   int left = 0;
   int right = 0;
-  int ret = 0;
+  indications ret = 0;
   int i;
  
   /* take a few samples in case the input is noisy */

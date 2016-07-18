@@ -33,11 +33,22 @@ extern indication_mode tail_lights_mode;
 #define animate() shift( (turn_lights & ( (scroll_flash[animation_index] << 8 ) | scroll_flash[animation_index]) ));
 #define animate_loop() shift( (turn_lights & ( (loop_pattern[animation_index] << 8 ) | loop_pattern[animation_index]) ));
 
+
+
+#if defined (__cplusplus)
+extern "C" {
+#endif
+
 void leds_init();
 void leds_reset();
 void brake_lights(indication_mode mode);
 void turn_signal(indications indication, indication_mode mode);
 void timer1_init();
+
+
+#if defined (__cplusplus)
+}
+#endif
 
 // blink patterns
 extern uint8_t scroll_pattern[4];

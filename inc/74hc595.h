@@ -10,9 +10,16 @@
 #define SREG_DDR			DDRF
 
 
-void shifter_init();
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
+void shifter_init();
 void shift(unsigned long data);
+
+#if defined (__cplusplus)
+}
+#endif
 
 
 #endif
