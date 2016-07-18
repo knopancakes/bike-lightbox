@@ -420,7 +420,7 @@ skipMsgPtrAssignment:
  */
 static inline void usbProcessRx(uchar *data, uchar len)
 {
-usbRequest_t    *rq = (usbRequest_t *)data;
+usbRequest_t    *rq = (void *)data;
 
 /* usbRxToken can be:
  * 0x2d 00101101 (USBPID_SETUP for setup data)

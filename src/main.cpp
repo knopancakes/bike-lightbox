@@ -7,10 +7,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <HIDSerial.h>
 
 #include "leds.h"
 #include "buttons.h"
+#include "serial.h"
 #include "lsm303dlhc.h"
 #include "74hc595.h"
 #include "brakecontrol.h"
@@ -26,7 +26,7 @@ int main()
   indication_mode pattern;
   unsigned char buffer[32];
 
-  HIDSerial serial;
+  Serial serial;
   PID accel;
 
   /* initialize hardware */

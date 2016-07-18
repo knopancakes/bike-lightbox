@@ -1,14 +1,14 @@
-#ifndef HIDSerial_h
-#define HIDSerial_h
+#ifndef serial_h
+#define serial_h
 
-#include "Arduino.h"
-#include "Print.h"
+//#include "Arduino.h"
+//#include "Print.h"
 
 #define HIDSERIAL_INBUFFER_SIZE 32
 
-class HIDSerial : public Print {
-public:
-  HIDSerial();
+class Serial{
+ public:
+  Serial();
   size_t write(uint8_t);  // write one character
   size_t write(const uint8_t *buffer, size_t size); // write a string
 
@@ -16,7 +16,7 @@ public:
   static unsigned char available();
   static unsigned char read(unsigned char *buffer);
   static void begin();
-private:
+ private:
   size_t write8(const uint8_t *buffer, size_t size);  // write up to 8 characters
 };
 
