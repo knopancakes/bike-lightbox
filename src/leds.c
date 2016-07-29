@@ -76,9 +76,6 @@ void turn_signal(indications indication, indication_mode mode)
 	case loop:
 		turn_lights_mode = loop;
 		break;
-	case random:
-		turn_lights_mode = random;
-		break;
 	default:
 		turn_lights_mode = off;
 		break;

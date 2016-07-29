@@ -17,7 +17,6 @@ typedef enum {
 	flash,
 	scroll,
 	loop,
-	random,
 	pwm
 } indication_mode ;
 

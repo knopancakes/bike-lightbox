@@ -3,6 +3,8 @@
 
 //#include "Arduino.h"
 //#include "Print.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 #define HIDSERIAL_INBUFFER_SIZE 32
 

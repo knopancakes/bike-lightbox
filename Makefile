@@ -7,7 +7,7 @@ CSOURCES := $(shell find $(SOURCEDIR) -name '*.c')
 CXXSOURCES := $(shell find $(SOURCEDIR) -name '*.cpp')
 OBJECTS := $(addprefix $(BUILDDIR)/,$(CSOURCES:%.c=%.c.o)) 		\
 	$(addprefix $(BUILDDIR)/,$(CXXSOURCES:%.cpp=%.cpp.o))	\
-	lib/usbdrv/usbdrv.o lib/usbdrv/usbdrvasm.o lib/usbdrv/oddebug.o
+	lib/usbdrv/usbdrv.c.o lib/usbdrv/usbdrvasm.c.o lib/usbdrv/oddebug.c.o
 
 MCU=atmega32u4
 CC=avr-gcc
