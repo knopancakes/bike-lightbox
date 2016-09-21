@@ -16,8 +16,8 @@
 #include "74hc595.h"
 #endif
 
-#define BRAKING_THRESHOLD  	 -980
-#define ACCEL_THRESHOLD		 980
+#define BRAKING_THRESHOLD  	 -1300
+#define ACCEL_THRESHOLD		 1300
 
 typedef struct {
   double windup_guard;
@@ -130,32 +130,32 @@ int main()
  
       if( (int)accel.control < BRAKING_THRESHOLD )
 	{
-	  intensity = 0x03FF;
-	}
-      else if( (int)accel.control > ACCEL_THRESHOLD )
-	{	
-	  //intensity = _intensity + 4;
-	  intensity = _intensity + 1;
-	}
-      else 
-	{
-	  intensity = 0x005F;
-	}
-      // bypass the controller
-      //intensity = 0xFFFF;
-   
+	  intensity = 0x04FF;
 
-      /* smooth transition */
-      if( (_intensity < intensity) && (_intensity < 0x03FF)) {
-	//OCR1B = _intensity + 2;
+	  /* direct, hard output */
+	  OCR1B = intensity;
+	}
+      else {
+	if( (int)accel.control > ACCEL_THRESHOLD )
+	  {	
+	    intensity = 0x01CF;
+	  }
+	else 
+	  {
+	    intensity = 0x004F;
+	  }
+	/* reset from braking */
+	if( _intensity > 0x01CF){
+	  OCR1B = 0x004F;
+	}
+	/* smooth transition */
+	else if( _intensity < intensity ) {
+	  OCR1B = _intensity + 1;
+	}
+	else if( _intensity > intensity ) {
+	  OCR1B = _intensity - 1;
+	}
       }
-      else if( (_intensity > intensity) && (_intensity > 0x002F)) {
-	//OCR1B = _intensity - 2;
-      }
-
-      /* direct, hard output */
-      OCR1B = intensity;
-
 
       /* check to see if the user input has changed state */
       command = get_signal_switch_status();
@@ -182,7 +182,6 @@ int main()
 
       /* debounce user input */
       last_command = command;
-      //_delay_ms(10);
       
     }
   
