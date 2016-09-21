@@ -134,7 +134,8 @@ int main()
 	}
       else if( (int)accel.control > ACCEL_THRESHOLD )
 	{	
-	  intensity = _intensity + 4;
+	  //intensity = _intensity + 4;
+	  intensity = _intensity + 1;
 	}
       else 
 	{
