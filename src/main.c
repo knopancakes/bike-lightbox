@@ -16,8 +16,8 @@
 #include "74hc595.h"
 #endif
 
-#define BRAKING_THRESHOLD  	 1
-#define ACCEL_THRESHOLD		 1
+#define BRAKING_THRESHOLD  	 -980
+#define ACCEL_THRESHOLD		 980
 
 typedef struct {
   double windup_guard;
@@ -108,7 +108,8 @@ int main()
   command = get_signal_switch_status();
   if(command != ind_off) 
     {
-      special_mode = true;
+      //special_mode = true;
+      special_mode = false;
     } 
   else 
     {
@@ -122,22 +123,38 @@ int main()
       
       /* update brake lights based on accel data */
       // +- 17000
+      uint16_t _intensity = OCR1B;
       uint16_t intensity = 0;
+      //uint8_t ebb_direction = 0;
       pid_update(&accel, (double)lsm303accelData.z, 1);
  
-      if( (int)accel.control > BRAKING_THRESHOLD )
+      if( (int)accel.control < BRAKING_THRESHOLD )
 	{
 	  intensity = 0x03FF;
 	}
-      else if( (int)accel.control < ACCEL_THRESHOLD )
-{	
-	  intensity = 0x0000;
+      else if( (int)accel.control > ACCEL_THRESHOLD )
+	{	
+	  intensity = _intensity + 4;
 	}
       else 
 	{
-	  intensity = 0x002F;
+	  intensity = 0x005F;
 	}
+      // bypass the controller
+      //intensity = 0xFFFF;
+   
+
+      /* smooth transition */
+      if( (_intensity < intensity) && (_intensity < 0x03FF)) {
+	//OCR1B = _intensity + 2;
+      }
+      else if( (_intensity > intensity) && (_intensity > 0x002F)) {
+	//OCR1B = _intensity - 2;
+      }
+
+      /* direct, hard output */
       OCR1B = intensity;
+
 
       /* check to see if the user input has changed state */
       command = get_signal_switch_status();
@@ -164,7 +181,7 @@ int main()
 
       /* debounce user input */
       last_command = command;
-      _delay_ms(10);
+      //_delay_ms(10);
       
     }
   
