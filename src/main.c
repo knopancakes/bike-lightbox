@@ -16,8 +16,8 @@
 #include "74hc595.h"
 #endif
 
-#define BRAKING_THRESHOLD  	 -1300
-#define ACCEL_THRESHOLD		 1300
+#define BRAKING_THRESHOLD  	 -900
+#define ACCEL_THRESHOLD		 900
 
 typedef struct {
   double windup_guard;
